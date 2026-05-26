@@ -103,7 +103,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Forzar a WhiteNoise a buscar archivos indexados en la raíz si es necesario
 WHITENOISE_INDEX_FILE = True
-
+import mimetypes
+mimetypes.add_type("image/svg+xml", ".svg", True)
 # Configuración dinámica para evitar errores 404 en desarrollo local y optimizar en Render
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
