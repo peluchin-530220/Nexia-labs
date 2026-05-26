@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>NEXIA Labs</title>
+{% load static %}
+<link rel="icon" type="image/svg+xml" href="{% static 'logo/logo1.png' %}" sizes="52x52">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+
+:root{
+  --navy:#0A1628;
+  --cyan:#00E5FF;
+  --violet:#6C4DFF;
+  --white:#F4F6F8;
+  --gray:#7C8999;
+  --dark-accent:#060E1B;
+
+  --card-bg:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.03) 0%,
+      rgba(255,255,255,0.01) 100%
+    );
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:100px;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--navy);
+  color:var(--white);
+  overflow-x:hidden;
+}
+
+/* ===== SCROLLBAR ===== */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:var(--navy);
+}
+
+::-webkit-scrollbar-thumb{
+  background:rgba(0,229,255,0.3);
+  border-radius:4px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:var(--cyan);
+}
+
+/* ===== BACKGROUND ===== */
+
+canvas#bg{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:-2;
+  opacity:0.45;
+  pointer-events:none;
+}
+
+/* ===== NAVBAR ===== */
+
+.holographic-nav{
+  position:fixed;
+  top:25px;
+  left:50%;
+  transform:translateX(-50%);
+
+  width:90%;
+  max-width:1200px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 24px 12px 30px;
+
+  background:rgba(10,22,40,0.45);
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:60px;
+
+  z-index:1000;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.5),
+    inset 0 0 20px rgba(0,229,255,0.03);
+
+  transition:all 0.4s cubic-bezier(0.25,1,0.5,1);
+}
+
+.holographic-nav::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:15%;
+  width:70%;
+  height:1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(0,229,255,0.8),
+      transparent
+    );
+
+  opacity:0.7;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+
+  font-family:"Space Grotesk",sans-serif;
+  font-weight:500;
+  letter-spacing:1px;
+}
+
+.logo-icon{
+  height:32px;
+  width:auto;
+
+  filter:drop-shadow(0 0 8px var(--cyan));
+}
+
+.labs-color{
+  color:var(--cyan);
+  text-shadow:0 0 10px rgba(0,229,255,0.3);
+}
+
+.nav-wrapper{
+  display:flex;
+  align-items:center;
+  gap:30px;
+}
+
+nav#nav-menu{
+  display:flex;
+  align-items:center;
+  gap:35px;
+}
+
+/* ===== LINKS ===== */
+
+.cyber-link{
+  color:var(--white);
+  text-decoration:none;
+
+  font-family:'Space Grotesk',sans-serif;
+  font-size:15px;
+  font-weight:500;
+
+  letter-spacing:0.5px;
+
+  position:relative;
+  padding:5px 10px;
+
+  transition:color 0.3s ease;
+}
+
+.cyber-link::before,
+.cyber-link::after{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+
+  opacity:0;
+
+  color:var(--cyan);
+  font-weight:700;
+
+  transition:all 0.3s ease;
+}
+
+.cyber-link::before{
+  content:'[';
+  left:-10px;
+  transform:translate(10px,-50%);
+}
+
+.cyber-link::after{
+  content:']';
+  right:-10px;
+  transform:translate(-10px,-50%);
+}
+
+.cyber-link:hover,
+.cyber-link.active{
+  color:var(--cyan);
+  text-shadow:0 0 10px rgba(0,229,255,0.4);
+}
+
+.cyber-link:hover::before,
+.cyber-link.active::before{
+  opacity:1;
+  transform:translate(0,-50%);
+}
+
+.cyber-link:hover::after,
+.cyber-link.active::after{
+  opacity:1;
+  transform:translate(0,-50%);
+}
+
+/* ===== BUTTON ===== */
+
+.cyber-btn{
+  background:rgba(0,229,255,0.05);
+  border:1px solid var(--cyan);
+
+  color:var(--cyan);
+
+  padding:10px 28px;
+  border-radius:50px;
+
+  text-decoration:none;
+
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:600;
+  text-transform:uppercase;
+  font-size:13px;
+  letter-spacing:1px;
+
+  transition:all 0.3s ease;
+
+  box-shadow:
+    0 0 15px rgba(0,229,255,0.1) inset;
+}
+
+.cyber-btn:hover{
+  background:var(--cyan);
+  color:var(--navy);
+
+  transform:scale(1.05);
+
+  box-shadow:
+    0 0 20px rgba(0,229,255,0.5),
+    0 0 30px rgba(0,229,255,0.3) inset;
+}
+
+.desktop-only{
+  display:block;
+}
+
+.mobile-only{
+  display:none;
+}
+
+/* ===== MOBILE ===== */
+
+.menu-toggle{
+  display:none;
+  flex-direction:column;
+  gap:6px;
+
+  cursor:pointer;
+
+  background:none;
+  border:none;
+
+  z-index:1100;
+}
+
+.menu-toggle span{
+  display:block;
+  width:26px;
+  height:2px;
+
+  background-color:var(--white);
+
+  transition:all 0.3s ease;
+}
+
+/* ===== HERO ===== */
+
+.contact-container{
+  max-width:1400px;
+  margin:0 auto;
+
+  padding:160px 80px 40px 80px;
+
+  display:grid;
+  grid-template-columns:1.1fr 0.9fr;
+  gap:50px;
+}
+
+.contact-hero-info{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.tech-badge{
+  background:rgba(0,229,255,0.05);
+  border:1px solid rgba(0,229,255,0.3);
+
+  padding:6px 16px;
+  border-radius:20px;
+
+  font-family:"Space Grotesk",sans-serif;
+  font-size:13px;
+
+  text-transform:uppercase;
+  letter-spacing:2px;
+
+  color:var(--cyan);
+
+  align-self:flex-start;
+  margin-bottom:20px;
+}
+
+.contact-container h1{
+  font-family:"Space Grotesk",sans-serif;
+
+  font-size:56px;
+  line-height:1.1;
+
+  margin-bottom:24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #A2B4C7 100%
+    );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+  color:var(--gray);
+  font-size:17px;
+  line-height:1.7;
+
+  max-width:580px;
+
+  margin-bottom:35px;
+}
+
+/* ===== SOCIAL ===== */
+
+.social-grid{
+  display:flex;
+  gap:16px;
+}
+
+.social-btn{
+  width:54px;
+  height:54px;
+
+  border-radius:16px;
+
+  background:rgba(255,255,255,0.02);
+
+  border:1px solid rgba(255,255,255,0.06);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--gray);
+
+  text-decoration:none;
+
+  transition:0.3s cubic-bezier(0.25,1,0.5,1);
+}
+
+.social-btn svg{
+  width:22px;
+  height:22px;
+}
+
+.social-btn:hover{
+  background:rgba(0,229,255,0.08);
+
+  border-color:var(--cyan);
+  color:var(--cyan);
+
+  transform:translateY(-4px);
+
+  box-shadow:
+    0 10px 25px rgba(0,229,255,0.2);
+}
+
+/* ===== FORM ===== */
+
+.form-card{
+  background:var(--card-bg);
+
+  border:1px solid rgba(255,255,255,0.04);
+
+  border-left:1px solid rgba(0,229,255,0.15);
+  border-top:1px solid rgba(0,229,255,0.15);
+
+  padding:40px;
+  border-radius:28px;
+
+  backdrop-filter:blur(16px);
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.3);
+}
+
+.form-card h2{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:24px;
+
+  margin-bottom:24px;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.form-group{
+  margin-bottom:20px;
+}
+
+.form-group label{
+  display:block;
+
+  font-size:12px;
+  color:var(--gray);
+
+  margin-bottom:8px;
+
+  font-weight:500;
+  letter-spacing:0.5px;
+
+  text-transform:uppercase;
+}
+
+.form-control{
+  width:100%;
+
+  background:rgba(6,14,27,0.6);
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  border-radius:10px;
+
+  padding:14px 16px;
+
+  color:var(--white);
+
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+
+  transition:all 0.3s ease;
+}
+
+.form-control:focus{
+  outline:none;
+
+  border-color:var(--cyan);
+
+  background:rgba(0,229,255,0.02);
+
+  box-shadow:
+    0 0 15px rgba(0,229,255,0.2);
+}
+
+textarea.form-control{
+  resize:none;
+  min-height:110px;
+}
+
+.btn{
+  width:100%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--cyan),
+      #00B0FF
+    );
+
+  color:var(--navy);
+
+  padding:14px 28px;
+  border-radius:10px;
+
+  font-weight:700;
+
+  border:none;
+  cursor:pointer;
+
+  transition:0.3s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 0 25px rgba(0,229,255,0.6);
+}
+
+/* ===== LOCATION SECTION ===== */
+
+.location-section{
+  max-width:1400px;
+  margin:20px auto 0 auto;
+
+  padding:40px 80px 80px 80px;
+}
+
+.location-header{
+  margin-bottom:40px;
+}
+
+.location-header h2{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:42px;
+
+  margin-bottom:18px;
+  line-height:1.1;
+}
+
+.gradient-text{
+  background:
+    linear-gradient(
+      135deg,
+      var(--cyan),
+      var(--violet)
+    );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.location-header p{
+  color:var(--gray);
+  line-height:1.7;
+
+  max-width:700px;
+}
+
+.location-grid{
+  display:grid;
+  grid-template-columns:1.2fr 0.8fr;
+  gap:30px;
+}
+
+/* ===== MAP ===== */
+
+.map-card{
+  position:relative;
+
+  background:var(--card-bg);
+
+  border:1px solid rgba(255,255,255,0.05);
+
+  border-left:1px solid rgba(0,229,255,0.2);
+  border-top:1px solid rgba(0,229,255,0.15);
+
+  border-radius:28px;
+
+  overflow:hidden;
+
+  backdrop-filter:blur(16px);
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.35);
+}
+
+.map-topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:18px 22px;
+
+  border-bottom:1px solid rgba(255,255,255,0.05);
+
+  background:rgba(255,255,255,0.02);
+}
+
+.map-status{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  color:var(--cyan);
+
+  font-size:13px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.pulse-dot{
+  width:10px;
+  height:10px;
+
+  border-radius:50%;
+
+  background:var(--cyan);
+
+  box-shadow:
+    0 0 15px var(--cyan);
+
+  animation:pulse 1.8s infinite;
+}
+
+@keyframes pulse{
+  0%{
+    transform:scale(1);
+    opacity:1;
+  }
+
+  50%{
+    transform:scale(1.4);
+    opacity:0.5;
+  }
+
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.map-coords{
+  color:var(--gray);
+  font-size:12px;
+  letter-spacing:1px;
+}
+
+#map{
+  width:100%;
+  height:520px;
+}
+
+/* ===== MAP OVERLAY ===== */
+
+.map-overlay{
+  position:absolute;
+  bottom:20px;
+  left:20px;
+
+  display:flex;
+  gap:15px;
+
+  z-index:500;
+}
+
+.overlay-card{
+  background:rgba(6,14,27,0.85);
+
+  border:1px solid rgba(0,229,255,0.12);
+
+  border-radius:16px;
+
+  padding:14px 18px;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  backdrop-filter:blur(14px);
+}
+
+.overlay-card i{
+  color:var(--cyan);
+}
+
+.overlay-card h4{
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.overlay-card p{
+  color:var(--gray);
+  font-size:12px;
+}
+
+/* ===== INFO CARD ===== */
+
+.location-info-card{
+  background:var(--card-bg);
+
+  border:1px solid rgba(255,255,255,0.05);
+
+  border-radius:28px;
+
+  padding:30px;
+
+  backdrop-filter:blur(16px);
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.35);
+
+  display:flex;
+  flex-direction:column;
+  gap:25px;
+}
+
+.info-block{
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+}
+
+.info-icon{
+  min-width:54px;
+  height:54px;
+
+  border-radius:16px;
+
+  background:rgba(0,229,255,0.08);
+
+  border:1px solid rgba(0,229,255,0.12);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--cyan);
+}
+
+.info-block h3{
+  font-family:"Space Grotesk",sans-serif;
+
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+.info-block p{
+  color:var(--gray);
+  line-height:1.6;
+  font-size:14px;
+}
+
+/* ===== STATS ===== */
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  margin-top:auto;
+}
+
+.stat-box{
+  padding:22px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,0.02);
+
+  border:1px solid rgba(255,255,255,0.04);
+
+  text-align:center;
+
+  transition:0.3s;
+}
+
+.stat-box:hover{
+  transform:translateY(-4px);
+
+  border-color:var(--cyan);
+
+  background:rgba(0,229,255,0.04);
+}
+
+.stat-box h4{
+  font-size:24px;
+
+  color:var(--cyan);
+
+  font-family:"Space Grotesk",sans-serif;
+
+  margin-bottom:6px;
+}
+
+.stat-box span{
+  color:var(--gray);
+  font-size:13px;
+}
+
+/* ===== LEAFLET ===== */
+
+.leaflet-container{
+  background:#08111f !important;
+}
+
+.leaflet-control-attribution{
+  display:none;
+}
+
+.leaflet-control-zoom{
+  border:none !important;
+}
+
+.leaflet-control-zoom a{
+  background:rgba(10,22,40,0.9) !important;
+  color:var(--cyan) !important;
+  border:none !important;
+}
+
+/* ===== FOOTER ===== */
+
+footer{
+  padding:50px 80px;
+
+  background:var(--dark-accent);
+
+  text-align:center;
+
+  margin-top:60px;
+
+  border-top:
+    1px solid rgba(255,255,255,0.03);
+
+  color:var(--gray);
+}
+.success-alert{
+
+  margin-bottom:20px;
+  padding:16px 18px;
+
+  border-radius:14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0,229,255,0.10),
+      rgba(108,77,255,0.08)
+    );
+
+  border:
+    1px solid rgba(0,229,255,0.25);
+
+  color:var(--cyan);
+
+  font-family:'Space Grotesk',sans-serif;
+  font-size:14px;
+  letter-spacing:0.5px;
+
+  backdrop-filter:blur(10px);
+
+  box-shadow:
+    0 0 20px rgba(0,229,255,0.08);
+
+  animation:fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn{
+
+  from{
+    opacity:0;
+    transform:translateY(-8px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media(max-width:1200px){
+
+  .contact-container,
+  .location-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:768px){
+
+  .menu-toggle{
+    display:flex;
+  }
+
+  .menu-toggle.active span:nth-child(1){
+    transform:translateY(8px) rotate(45deg);
+    background-color:var(--cyan);
+  }
+
+  .menu-toggle.active span:nth-child(2){
+    opacity:0;
+  }
+
+  .menu-toggle.active span:nth-child(3){
+    transform:translateY(-8px) rotate(-45deg);
+    background-color:var(--cyan);
+  }
+
+  .holographic-nav{
+    top:15px;
+    width:92%;
+    padding:12px 20px;
+    border-radius:20px;
+  }
+
+  .desktop-only{
+    display:none;
+  }
+
+  .mobile-only{
+    display:block;
+    margin-top:20px;
+    text-align:center;
+    width:100%;
+  }
+
+  nav#nav-menu{
+    position:fixed;
+    top:0;
+    right:-100%;
+
+    width:280px;
+    height:100vh;
+
+    background:rgba(6,14,27,0.98);
+
+    backdrop-filter:blur(24px);
+
+    box-shadow:-10px 0 30px rgba(0,0,0,0.6);
+
+    flex-direction:column;
+    justify-content:center;
+    gap:24px;
+
+    transition:right 0.4s cubic-bezier(0.77,0.2,0.05,1);
+
+    z-index:1050;
+
+    padding:40px;
+  }
+
+  nav#nav-menu.active{
+    right:0;
+  }
+
+  .cyber-link{
+    font-size:18px;
+    width:100%;
+    text-align:center;
+  }
+
+  .contact-container{
+    padding:120px 20px 20px 20px;
+  }
+
+  .contact-container h1{
+    font-size:36px;
+  }
+
+  .location-section{
+    padding:20px;
+  }
+
+  .location-header h2{
+    font-size:32px;
+  }
+
+  #map{
+    height:380px;
+  }
+
+  .map-overlay{
+    position:relative;
+    bottom:auto;
+    left:auto;
+
+    flex-direction:column;
+
+    padding:20px;
+  }
+
+  footer{
+    padding:40px 20px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+{% load static %}
+<canvas id="bg"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+
+<header class="holographic-nav" id="header">
+
+  <div class="logo">
+
+     <img src="{% static 'logo/gemini-svg.svg' %}" alt="Logo de mi Web" width="50" height="50" class="d-inline-block align-text-top" >
+    <span class="logo-text">
+      NEXIA <span class="labs-color">Labs</span>
+    </span>
+
+  </div>
+
+  <div class="nav-wrapper">
+
+    <nav id="nav-menu">
+
+      <a href="{% url 'index' %}" class="cyber-link">
+        Inicio
+      </a>
+
+
+      <a href="{% url 'sobre' %}" class="cyber-link">
+        Sobre
+      </a>
+
+      <a href="#" class="cyber-btn mobile-only">
+        Agendar reunión
+      </a>
+
+    </nav>
+
+    <a href="#" class="cyber-btn desktop-only">
+      Agendar reunión
+    </a>
+
+    <button class="menu-toggle" id="mobile-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+
+</header>
+
+<!-- ===== HERO ===== -->
+
+<main>
+
+<div class="contact-container">
+
+  <div class="contact-hero-info">
+
+    <div class="tech-badge">
+      // Secure Communications Gateway
+    </div>
+
+    <h1>
+      Conectemos tu ecosistema empresarial.
+    </h1>
+
+    <p class="subtitle">
+      Escríbenos directamente a través de nuestra
+      pasarela cifrada con infraestructura
+      optimizada para empresas modernas.
+    </p>
+
+
+<div class="social-grid">
+
+  <!-- WhatsApp -->
+ <a href="https://wa.me/59173918567?text=Hola%20NEXIA%20Labs,%20solicito%20más%20información%20sobre%20sus%20servicios%20tecnológicos." class="social-btn" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+    8.5 8.5 0 0 1-7.6 4.7
+    8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7
+    a8.38 8.38 0 0 1-.9-3.8
+    8.5 8.5 0 0 1 4.7-7.6
+    8.38 8.38 0 0 1 3.8-.9h.5
+    a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+</a>
+
+  <!-- Facebook -->
+  <a href="https://facebook.com" class="social-btn" target="_blank" aria-label="Facebook">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    </svg>
+  </a>
+
+  <!-- Gmail -->
+<a href="https://mail.google.com/mail/?view=cm&fs=1&to=nexia.labs1@gmail.com" class="social-btn" target="_blank" aria-label="Gmail">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+    <polyline points="22,6 12,13 2,6"/>
+  </svg>
+</a>
+
+  <!-- TikTok -->
+  <a href="https://tiktok.com" class="social-btn" target="_blank" aria-label="TikTok">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4
+      a5 5 0 0 0 5 5"/>
+    </svg>
+  </a>
+<a href="https://linkedin.com/in/tu-usuario-o-empresa" class="social-btn" target="_blank" aria-label="LinkedIn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+    <rect x="2" y="9" width="4" height="12"/>
+    <circle cx="4" cy="4" r="2"/>
+  </svg>
+</a>
+</div>
+```
+
+
+  </div>
+
+  <div class="form-card">
+{% if messages %}
+    {% for message in messages %}
+
+        <div class="success-alert">
+            {{ message }}
+        </div>
+
+    {% endfor %}
+{% endif %}
+<h2>
+      <i data-lucide="terminal" style="color:var(--cyan);"></i>
+      Mensaje Directo
+    </h2>
+
+  <!-- FORM -->
+   <form method="POST">
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" name="nombre" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label>Correo</label>
+        <input type="email" name="correo" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label>Mensaje</label>
+        <textarea name="mensaje" class="form-control" required></textarea>
+    </div>
+
+    <button type="submit" class="btn">
+        Transmitir Datos
+    </button>
+
+</form>
+  </div>
+  
+
+</div>
+
+<!-- ===== LOCATION ===== -->
+
+<section class="location-section">
+
+  <div class="location-header">
+
+    <div class="tech-badge">
+      // Geo Intelligence Node
+    </div>
+
+    <h2>
+      Presencia estratégica en
+      <span class="gradient-text">
+        Magdalena, Beni
+      </span>
+    </h2>
+
+    <p>
+      Nuestro centro operativo conecta infraestructura digital,
+      análisis de datos y comunicación empresarial
+      desde el corazón amazónico.
+    </p>
+
+  </div>
+
+  <div class="location-grid">
+
+    <!-- MAP -->
+
+    <div class="map-card">
+
+      <div class="map-topbar">
+
+        <div class="map-status">
+          <span class="pulse-dot"></span>
+          Nodo Activo
+        </div>
+
+        <div class="map-coords">
+          MAGDALENA · BENI · BOLIVIA
+        </div>
+
+      </div>
+
+      <div id="map"></div>
+
+      <div class="map-overlay">
+
+        <div class="overlay-card">
+
+          <i data-lucide="map-pin"></i>
+
+          <div>
+            <h4>Ubicación</h4>
+            <p>Magdalena, Beni</p>
+          </div>
+
+        </div>
+
+        <div class="overlay-card">
+
+          <i data-lucide="wifi"></i>
+
+          <div>
+            <h4>Conectividad</h4>
+            <p>Infraestructura activa</p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- INFO -->
+
+    <div class="location-info-card">
+
+      <div class="info-block">
+
+        <div class="info-icon">
+          <i data-lucide="radar"></i>
+        </div>
+
+        <div>
+
+          <h3>Centro Operativo</h3>
+
+          <p>
+            Arquitectura tecnológica enfocada
+            en monitoreo, automatización
+            y procesamiento de información.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="info-block">
+
+        <div class="info-icon">
+          <i data-lucide="shield-check"></i>
+        </div>
+
+        <div>
+
+          <h3>Seguridad Empresarial</h3>
+
+          <p>
+            Comunicaciones protegidas y
+            entornos digitales diseñados
+            bajo estándares corporativos.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="info-block">
+
+        <div class="info-icon">
+          <i data-lucide="cpu"></i>
+        </div>
+
+        <div>
+
+          <h3>Infraestructura Inteligente</h3>
+
+          <p>
+            Sistemas modernos preparados
+            para IA, automatización
+            y crecimiento escalable.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-box">
+          <h4>24/7</h4>
+          <span>Monitoreo</span>
+        </div>
+
+        <div class="stat-box">
+          <h4>AI</h4>
+          <span>Integraciones</span>
+        </div>
+
+        <div class="stat-box">
+          <h4>Cloud</h4>
+          <span>Infraestructura</span>
+        </div>
+
+        <div class="stat-box">
+          <h4>Secure</h4>
+          <span>Gateway</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+
+<footer>
+  © 2026 NEXIA Labs — Todos los derechos reservados.
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+/* ===== ICONS ===== */
+
+lucide.createIcons();
+
+/* ===== MOBILE MENU ===== */
+
+const mobileToggle =
+  document.getElementById('mobile-toggle');
+
+const navMenu =
+  document.getElementById('nav-menu');
+
+mobileToggle.addEventListener('click', () => {
+
+  mobileToggle.classList.toggle('active');
+
+  navMenu.classList.toggle('active');
+
+});
+
+/* ===== CLOSE MENU ===== */
+
+document.querySelectorAll('#nav-menu a')
+.forEach(link => {
+
+  link.addEventListener('click', () => {
+
+    mobileToggle.classList.remove('active');
+
+    navMenu.classList.remove('active');
+
+  });
+
+});
+
+/* ===== NAV EFFECT ===== */
+
+window.addEventListener('scroll', () => {
+
+  const header =
+    document.getElementById('header');
+
+  if(window.scrollY > 40){
+
+    header.style.top =
+      window.innerWidth > 768
+      ? "10px"
+      : "5px";
+
+    header.style.padding =
+      window.innerWidth > 768
+      ? "8px 24px 8px 30px"
+      : "8px 20px";
+
+    header.style.background =
+      "rgba(6,14,27,0.7)";
+
+    header.style.borderColor =
+      "rgba(0,229,255,0.3)";
+
+  }else{
+
+    header.style.top =
+      window.innerWidth > 768
+      ? "25px"
+      : "15px";
+
+    header.style.padding =
+      window.innerWidth > 768
+      ? "12px 24px 12px 30px"
+      : "12px 20px";
+
+    header.style.background =
+      "rgba(10,22,40,0.45)";
+
+    header.style.borderColor =
+      "rgba(0,229,255,0.15)";
+  }
+
+});
+
+/* ===== MAP ===== */
+
+const map = L.map('map', {
+  zoomControl:true,
+  scrollWheelZoom:false
+})
+.setView([-13.2607, -64.0618], 13);
+
+L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  {
+    attribution:''
+  }
+).addTo(map);
+
+const customIcon = L.divIcon({
+  className:'custom-marker',
+  html:`
+    <div style="
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#00E5FF;
+      border:4px solid rgba(255,255,255,0.9);
+      box-shadow:
+        0 0 25px rgba(0,229,255,0.9),
+        0 0 60px rgba(0,229,255,0.5);
+      animation:pulse 2s infinite;
+    "></div>
+  `,
+  iconSize:[22,22],
+  iconAnchor:[11,11]
+});
+
+L.marker(
+  [-13.2607, -64.0618],
+  { icon:customIcon }
+)
+.addTo(map)
+.bindPopup(`
+  <div style="
+    background:#08111f;
+    color:white;
+    padding:6px;
+    font-family:Inter,sans-serif;
+  ">
+    <strong style="color:#00E5FF;">
+      NEXIA Labs
+    </strong>
+    <br>
+    Magdalena · Beni
+  </div>
+`);
+
+/* ===== PLEXUS ===== */
+
+const canvas =
+  document.getElementById("bg");
+
+const ctx =
+  canvas.getContext("2d");
+
+function resizeCanvas(){
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+}
+
+resizeCanvas();
+
+window.addEventListener(
+  'resize',
+  resizeCanvas
+);
+
+let particles = [];
+
+const particleCount =
+  Math.min(65, window.innerWidth / 15);
+
+for(let i=0; i<particleCount; i++){
+
+  particles.push({
+
+    x:Math.random() * canvas.width,
+
+    y:Math.random() * canvas.height,
+
+    vx:(Math.random() - 0.5) * 0.5,
+
+    vy:(Math.random() - 0.5) * 0.5,
+
+    radius:Math.random() * 2.2 + 1.5
+
+  });
+
+}
+
+function animate(){
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  particles.forEach(p => {
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    if(
+      p.x < 0 ||
+      p.x > canvas.width
+    ) p.vx *= -1;
+
+    if(
+      p.y < 0 ||
+      p.y > canvas.height
+    ) p.vy *= -1;
+
+    ctx.fillStyle = "#00E5FF";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      p.x,
+      p.y,
+      p.radius,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+  });
+
+  for(let i=0; i<particles.length; i++){
+
+    for(let j=i+1; j<particles.length; j++){
+
+      const dist = Math.hypot(
+        particles[i].x - particles[j].x,
+        particles[i].y - particles[j].y
+      );
+
+      if(dist < 135){
+
+        ctx.strokeStyle =
+          `rgba(0,229,255,${
+            0.22 * (1 - dist / 135)
+          })`;
+
+        ctx.lineWidth = 0.7;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          particles[i].x,
+          particles[i].y
+        );
+
+        ctx.lineTo(
+          particles[j].x,
+          particles[j].y
+        );
+
+        ctx.stroke();
+
+      }
+
+    }
+
+  }
+
+  requestAnimationFrame(animate);
+
+}
+
+animate();
+
+</script>
+
+</body>
+</html>

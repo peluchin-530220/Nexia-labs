@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: nexia-labs
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn djangonexia.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
