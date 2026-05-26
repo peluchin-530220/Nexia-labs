@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import mimetypes
 
-# BASE DIR
+# 1. JERARQUÍA CRÍTICA (BASE_DIR DEBE IR PRIMERO PARA EVITAR NAMEERROR EN RENDER)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
@@ -37,9 +37,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -57,12 +55,8 @@ ROOT_URLCONF = 'djangonexia.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
-        # IMPORTANTE PARA TU ESTRUCTURA
-        'DIRS': [],
-
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
-
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -106,15 +100,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # INTERNATIONALIZATION
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# STATIC FILES
+# ==============================================================================
+# CONFIGURACIÓN ESTÁTICA COMPATIBLE CON INSTANCIAS GRATUITAS DE RENDER
+# ==============================================================================
 STATIC_URL = 'static/'
 
 # Carpeta static local
@@ -125,12 +118,12 @@ STATICFILES_DIRS = [
 # Carpeta de producción para Render
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# WhiteNoise
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Almacenamiento directo estándar de WhiteNoise (sirve los archivos tal cual, ideal para cuentas Free)
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 
 WHITENOISE_INDEX_FILE = True
 
-# SVG SUPPORT
+# SOPORTE EXPLÍCITO DE FORMATO SVG
 mimetypes.add_type("image/svg+xml", ".svg", True)
 
 
@@ -140,13 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # EMAIL CONFIGURATION
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 EMAIL_HOST = 'smtp.gmail.com'
-
 EMAIL_PORT = 587
-
 EMAIL_USE_TLS = True
-
 EMAIL_HOST_USER = 'nexia.labs1@gmail.com'
-
 EMAIL_HOST_PASSWORD = 'vgal dpwc orhy igdq'
