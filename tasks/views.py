@@ -1,13 +1,11 @@
-from django.shortcuts import render
+import os
+from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from django.shortcuts import render
 from django.contrib import messages
 
-# Create your views here.
+
 def index(request):
     return render(request, 'index.html')
-
-
 
 
 def contacto(request):
@@ -19,26 +17,35 @@ def contacto(request):
         mensaje = request.POST.get('mensaje')
 
         contenido = f"""
-        Nuevo mensaje desde NEXIA Labs
+Nuevo mensaje desde NEXIA Labs
 
-        Nombre: {nombre}
-        Correo: {correo}
+Nombre: {nombre}
+Correo: {correo}
 
-        Mensaje:
-        {mensaje}
-        """
+Mensaje:
+{mensaje}
+"""
 
-        send_mail(
-            subject='Nuevo mensaje desde la web',
-            message=contenido,
-            from_email='nexia.labs1@gmail.com',
-            recipient_list=['nexia.labs1@gmail.com'],
-            fail_silently=False,
-        )
+        try:
 
-        messages.success(request, 'Mensaje enviado correctamente')
+            send_mail(
+                subject='Nuevo mensaje desde la web',
+                message=contenido,
+                from_email=os.environ.get('EMAIL_HOST_USER'),
+                recipient_list=['nexia.labs1@gmail.com'],
+                fail_silently=False,
+            )
+
+            messages.success(request, 'Mensaje enviado correctamente')
+
+        except Exception as e:
+
+            messages.error(request, f'Error al enviar: {e}')
+
+        return redirect('contacto')
 
     return render(request, 'contacto.html')
+
 
 def sobre(request):
     return render(request, 'sobre.html')
