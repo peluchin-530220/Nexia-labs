@@ -1,6 +1,7 @@
 import os
+import requests
+
 from django.shortcuts import render, redirect
-from django.core.mail import send_mail
 from django.contrib import messages
 
 
@@ -28,19 +29,29 @@ Mensaje:
 
         try:
 
-            send_mail(
-                subject='Nuevo mensaje desde la web',
-                message=contenido,
-                from_email=os.environ.get('EMAIL_HOST_USER'),
-                recipient_list=['nexia.labs1@gmail.com'],
-                fail_silently=False,
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {os.environ.get('RESEND_API_KEY')}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from": "onboarding@resend.dev",
+                    "to": "nexia.labs1@gmail.com",
+                    "subject": "Nuevo mensaje desde la web",
+                    "text": contenido,
+                },
+                timeout=5
             )
 
-            messages.success(request, 'Mensaje enviado correctamente')
+            if response.status_code == 200:
+                messages.success(request, 'Mensaje enviado correctamente')
+            else:
+                messages.error(request, f'Error: {response.text}')
 
         except Exception as e:
 
-            messages.error(request, f'Error al enviar: {e}')
+            messages.error(request, f'Error: {e}')
 
         return redirect('contacto')
 
