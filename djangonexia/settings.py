@@ -108,12 +108,16 @@ USE_TZ = True
 # ==============================================================================
 # CONFIGURACIÓN ESTÁTICA COMPATIBLE CON INSTANCIAS GRATUITAS DE RENDER
 # ==============================================================================
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
-# Carpeta static local
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Carpeta de producción para Render
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
