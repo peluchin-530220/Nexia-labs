@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -39,13 +39,13 @@ body{
   overflow-x: hidden;
 }
 
-/* ===== BACKGROUND CANVAS ===== */
+/* ===== BACKGROUND CANVAS MEJORADO ===== */
 canvas#bg{
   position:fixed;
   top:0;
   left:0;
   z-index:-2;
-  opacity:0.45;
+  opacity:0.85; /* Más visible */
   pointer-events: none;
 }
 
@@ -394,18 +394,15 @@ nav#nav-menu{
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:1024px){
-
   .strategic-grid{
     grid-template-columns:1fr;
   }
-
   .hero-sobre h1{
     font-size:42px;
   }
 }
 
 @media(max-width:768px){
-
   .menu-toggle{
     display:flex;
   }
@@ -488,7 +485,6 @@ nav#nav-menu{
     padding:20px 24px;
   }
 }
-
 </style>
 </head>
 
@@ -496,9 +492,7 @@ nav#nav-menu{
 {% load static %}
 <canvas id="bg"></canvas>
 
-<!-- NAVBAR NUEVO -->
 <header class="holographic-nav" id="header">
-
   <div class="logo">
     <img src="{% static 'logo2.svg' %}" alt="Logo de mi Web" width="50" height="50" class="d-inline-block align-text-top" >
     <span class="logo-text">
@@ -507,18 +501,10 @@ nav#nav-menu{
   </div>
 
   <div class="nav-wrapper">
-
     <nav id="nav-menu">
-
       <a href="{% url 'index' %}" class="cyber-link">Inicio</a>
-
-
       <a href="{% url 'contacto' %}" class="cyber-link">Contacto</a>
-
-      <a href="#" class="cyber-btn mobile-only">
-        Agendar reunión
-      </a>
-
+      <a href="#" class="cyber-btn mobile-only">Agendar reunión</a>
     </nav>
 
     <a href="{% url 'contacto' %}" class="cyber-btn desktop-only">
@@ -530,38 +516,28 @@ nav#nav-menu{
       <span></span>
       <span></span>
     </button>
-
   </div>
-
 </header>
 
 <main>
-
 <section class="hero-sobre">
-
   <div class="tech-badge">
     // Nuestra Identidad Corporativa
   </div>
-
   <h1>Quiénes somos.</h1>
-
   <p class="lead">
     NEXIA Labs es un nexo: conectamos datos con decisiones,
     tecnología con negocio, complejidad con claridad.
     Todo lo que hacemos parte de esta idea simple.
   </p>
-
 </section>
 
 <section class="strategic-grid">
-
   <div class="strat-card">
     <div class="strat-icon">
       <i data-lucide="target"></i>
     </div>
-
     <h3>Misión</h3>
-
     <p>
       Transformar la forma en que las empresas toman decisiones,
       mediante datos, inteligencia artificial y consultoría estratégica.
@@ -572,9 +548,7 @@ nav#nav-menu{
     <div class="strat-icon">
       <i data-lucide="eye"></i>
     </div>
-
     <h3>Visión</h3>
-
     <p>
       Ser el referente de consultoría en datos e IA en Bolivia
       y la región amazónica.
@@ -585,34 +559,26 @@ nav#nav-menu{
     <div class="strat-icon">
       <i data-lucide="award"></i>
     </div>
-
     <h3>Promesa</h3>
-
     <p>
       Cada proyecto entrega una métrica de impacto concreta.
     </p>
   </div>
-
 </section>
 
 <section class="values-section">
-
   <div class="values-title">
     <h2>Valores fundacionales</h2>
     <div class="values-line"></div>
   </div>
 
   <div class="values-grid">
-
     <div class="value-item">
       <div class="value-header">
         <i data-lucide="activity" style="color:var(--violet); width:20px;"></i>
         <h4>Rigor</h4>
       </div>
-
-      <p>
-        Datos antes que opiniones.
-      </p>
+      <p>Datos antes que opiniones.</p>
     </div>
 
     <div class="value-item">
@@ -620,10 +586,7 @@ nav#nav-menu{
         <i data-lucide="search" style="color:var(--violet); width:20px;"></i>
         <h4>Claridad</h4>
       </div>
-
-      <p>
-        Traducimos lo complejo en acción.
-      </p>
+      <p>Traducimos lo complejo en acción.</p>
     </div>
 
     <div class="value-item">
@@ -631,20 +594,14 @@ nav#nav-menu{
         <i data-lucide="zap" style="color:var(--violet); width:20px;"></i>
         <h4>Innovación</h4>
       </div>
-
-      <p>
-        IA aplicada, no IA de moda.
-      </p>
+      <p>IA aplicada, no IA de moda.</p>
     </div>
-
   </div>
-
 </section>
 
 </main>
 
 <script>
-
 /* ICONOS */
 lucide.createIcons();
 
@@ -666,13 +623,10 @@ document.querySelectorAll('#nav-menu a').forEach(link => {
 
 /* EFECTO NAVBAR AL SCROLL */
 window.addEventListener('scroll', () => {
-
   const header = document.getElementById('header');
 
   if(window.scrollY > 40){
-
     header.style.top = window.innerWidth > 768 ? "10px" : "5px";
-
     header.style.padding =
       window.innerWidth > 768
       ? "8px 24px 8px 30px"
@@ -682,7 +636,6 @@ window.addEventListener('scroll', () => {
     header.style.borderColor = "rgba(0, 229, 255, 0.3)";
 
   } else {
-
     header.style.top =
       window.innerWidth > 768
       ? "25px"
@@ -700,130 +653,76 @@ window.addEventListener('scroll', () => {
 
 /* REVEAL ANIMATION */
 const reveals = document.querySelectorAll('.strat-card, .value-item');
-
 const observer = new IntersectionObserver(entries => {
-
   entries.forEach(entry => {
-
     if(entry.isIntersecting){
-
       entry.target.style.opacity = "1";
-
-      entry.target.style.transform =
-        "translateY(0) scale(1)";
-
-      entry.target.style.transition =
-        "all 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
+      entry.target.style.transform = "translateY(0) scale(1)";
+      entry.target.style.transition = "all 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
     }
-
   });
-
 }, { threshold: 0.1 });
-
 reveals.forEach(r => observer.observe(r));
 
-/* CANVAS PLEXUS */
+/* CANVAS PLEXUS MEJORADO */
 const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
+const colors = ["#00E5FF", "#6C4DFF"];
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-
+window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-window.addEventListener('resize', resizeCanvas);
-
 let particles = [];
-
-const particleCount =
-  Math.min(65, window.innerWidth / 15);
+const particleCount = window.innerWidth < 768 ? 50 : 80;
 
 for(let i=0; i<particleCount; i++){
-
   particles.push({
-
     x: Math.random() * canvas.width,
-
     y: Math.random() * canvas.height,
-
-    vx: (Math.random() - 0.5) * 0.5,
-
-    vy: (Math.random() - 0.5) * 0.5,
-
-    radius: Math.random() * 2.2 + 1.5
+    vx: (Math.random() - 0.5) * 0.7,
+    vy: (Math.random() - 0.5) * 0.7,
+    radius: Math.random() * 3 + 2,
+    color: colors[Math.floor(Math.random() * colors.length)]
   });
 }
 
 function animate(){
-
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
   particles.forEach(p => {
-
     p.x += p.vx;
     p.y += p.vy;
-
     if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
     if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-    ctx.fillStyle = "#00E5FF";
-
+    
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = p.color;
+    ctx.fillStyle = p.color;
     ctx.beginPath();
-
-    ctx.arc(
-      p.x,
-      p.y,
-      p.radius,
-      0,
-      Math.PI * 2
-    );
-
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
     ctx.fill();
-
   });
 
   for(let i=0; i<particles.length; i++){
-
     for(let j=i+1; j<particles.length; j++){
-
-      const dist = Math.hypot(
-        particles[i].x - particles[j].x,
-        particles[i].y - particles[j].y
-      );
-
-      if(dist < 135){
-
-        ctx.strokeStyle =
-          `rgba(0,229,255,${
-            0.22 * (1 - dist / 135)
-          })`;
-
-        ctx.lineWidth = 0.7;
-
+      const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+      if(dist < 140){
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = particles[i].color === "#00E5FF" ? `rgba(0, 229, 255, ${0.4 * (1 - dist/140)})` : `rgba(108, 77, 255, ${0.4 * (1 - dist/140)})`;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-
-        ctx.moveTo(
-          particles[i].x,
-          particles[i].y
-        );
-
-        ctx.lineTo(
-          particles[j].x,
-          particles[j].y
-        );
-
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
         ctx.stroke();
       }
     }
   }
-
   requestAnimationFrame(animate);
 }
-
 animate();
-
 </script>
 
 </body>

@@ -44,13 +44,13 @@ body{
   overflow-x: hidden;
 }
 
-/* ===== BACKGROUND CANVAS ===== */
+/* ===== BACKGROUND CANVAS MEJORADO ===== */
 canvas{
   position:fixed;
   top:0;
   left:0;
   z-index:-2;
-  opacity:0.45;
+  opacity:0.85; /* Subimos la opacidad general para que resalte más */
   pointer-events: none;
 }
 
@@ -760,29 +760,39 @@ window.addEventListener('scroll', () => {
   }
 });
 
-/* ANIMACIÓN PLEXUS NEURONAL */
+/* =========================================
+   ANIMACIÓN PLEXUS NEURONAL MEJORADA 
+   ========================================= */
 const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
+
+let particles = [];
+const colors = ["#00E5FF", "#6C4DFF"]; // Colores Cyberpunk: Cyan y Violeta
+
+function initParticles() {
+  particles = [];
+  // Asegurar una buena cantidad de partículas incluso en móviles (Mínimo 50)
+  const particleCount = window.innerWidth < 768 ? 50 : Math.min(80, window.innerWidth / 15);
+
+  for(let i=0; i<particleCount; i++){
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.7, 
+      vy: (Math.random() - 0.5) * 0.7,
+      radius: Math.random() * 3 + 2, // Bolitas más grandes
+      color: colors[Math.floor(Math.random() * colors.length)] // Color aleatorio
+    });
+  }
+}
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  initParticles(); // Reinicializa al redimensionar para ajustar a la pantalla
 }
-resizeCanvas();
+
 window.addEventListener('resize', resizeCanvas);
-
-let particles = [];
-const particleCount = Math.min(65, window.innerWidth / 15);
-
-for(let i=0; i<particleCount; i++){
-  particles.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.5,
-    vy: (Math.random() - 0.5) * 0.5,
-    radius: Math.random() * 2.2 + 1.5 
-  });
-}
 
 function animate(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -794,18 +804,37 @@ function animate(){
     if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
     if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
-    ctx.fillStyle = "#00E5FF";
+    // Dibujar partículas con brillo
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.shadowBlur = 12; // Efecto Glow
+    ctx.shadowColor = p.color;
     ctx.fill();
   });
 
+  // Dibujar conexiones
   for(let i = 0; i < particles.length; i++) {
     for(let j = i + 1; j < particles.length; j++) {
       const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
-      if(dist < 135) {
-        ctx.strokeStyle = `rgba(0, 229, 255, ${0.22 * (1 - dist / 135)})`;
-        ctx.lineWidth = 0.7;
+      const maxDist = window.innerWidth < 768 ? 110 : 140; // Distancia de conexión
+
+      if(dist < maxDist) {
+        // Opacidad aumentada significativamente (de 0.22 a 0.6)
+        let opacity = 0.6 * (1 - dist / maxDist);
+        
+        ctx.shadowBlur = 0; // Apagamos el blur en las líneas por rendimiento
+        
+        // La línea toma el color de la partícula de origen
+        if (particles[i].color === "#00E5FF") {
+          ctx.strokeStyle = `rgba(0, 229, 255, ${opacity})`;
+        } else {
+          ctx.strokeStyle = `rgba(108, 77, 255, ${opacity})`;
+        }
+        
+        // Líneas más gruesas, especialmente en móvil
+        ctx.lineWidth = window.innerWidth < 768 ? 1.5 : 1; 
+        
         ctx.beginPath();
         ctx.moveTo(particles[i].x, particles[i].y);
         ctx.lineTo(particles[j].x, particles[j].y);
@@ -815,6 +844,9 @@ function animate(){
   }
   requestAnimationFrame(animate);
 }
+
+// Iniciar
+resizeCanvas();
 animate();
 </script>
 

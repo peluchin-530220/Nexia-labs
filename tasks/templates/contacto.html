@@ -78,7 +78,7 @@ canvas#bg{
   top:0;
   left:0;
   z-index:-2;
-  opacity:0.45;
+  opacity:0.85; 
   pointer-events:none;
 }
 
@@ -578,10 +578,10 @@ textarea.form-control{
 
   background:var(--card-bg);
 
-  border:1px solid rgba(255,255,255,0.05);
+  border:1px solid rgba(255, 255, 255, 0.829);
 
-  border-left:1px solid rgba(0,229,255,0.2);
-  border-top:1px solid rgba(0,229,255,0.15);
+  border-left:1px solid rgba(0, 0, 0, 0.2);
+  border-top:1px solid rgb(0, 0, 0);
 
   border-radius:28px;
 
@@ -805,24 +805,37 @@ textarea.form-control{
   font-size:13px;
 }
 
-/* ===== LEAFLET ===== */
+/* ===== LEAFLET MODIFICADO ===== */
+/* ===== MAPA CLARO CORPORATIVO NEXIA ===== */
+/* MAPA ESTILO NEXIA */
 
 .leaflet-container{
-  background:#08111f !important;
+    background:#08111f !important;
 }
 
-.leaflet-control-attribution{
-  display:none;
+.leaflet-tile-pane{
+    filter:
+      invert(1)
+      hue-rotate(180deg)
+      brightness(1.4)
+      contrast(1.6);
 }
 
-.leaflet-control-zoom{
-  border:none !important;
+/* Hace que las calles resalten más */
+
+.leaflet-tile{
+    opacity:1 !important;
 }
 
 .leaflet-control-zoom a{
-  background:rgba(10,22,40,0.9) !important;
-  color:var(--cyan) !important;
-  border:none !important;
+    background:#08111f !important;
+    color:#00E5FF !important;
+    border:1px solid rgba(0,229,255,.25) !important;
+}
+
+.leaflet-popup-content-wrapper{
+    background:#08111f;
+    color:white;
 }
 
 /* ===== FOOTER ===== */
@@ -1013,8 +1026,6 @@ footer{
 {% load static %}
 <canvas id="bg"></canvas>
 
-<!-- ===== NAVBAR ===== -->
-
 <header class="holographic-nav" id="header">
 
   <div class="logo">
@@ -1059,8 +1070,6 @@ footer{
 
 </header>
 
-<!-- ===== HERO ===== -->
-
 <main>
 
 <div class="contact-container">
@@ -1084,8 +1093,7 @@ footer{
 
 <div class="social-grid">
 
-  <!-- WhatsApp -->
- <a href="https://wa.me/59173918567?text=Hola%20NEXIA%20Labs,%20solicito%20más%20información%20sobre%20sus%20servicios%20tecnológicos." class="social-btn" target="_blank" aria-label="WhatsApp">
+  <a href="https://wa.me/59173918567?text=Hola%20NEXIA%20Labs,%20solicito%20más%20información%20sobre%20sus%20servicios%20tecnológicos." class="social-btn" target="_blank" aria-label="WhatsApp">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
@@ -1098,7 +1106,6 @@ footer{
   </svg>
 </a>
 
-  <!-- Facebook -->
   <a href="https://facebook.com" class="social-btn" target="_blank" aria-label="Facebook">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1106,8 +1113,7 @@ footer{
     </svg>
   </a>
 
-  <!-- Gmail -->
-<a href="https://mail.google.com/mail/?view=cm&fs=1&to=nexia.labs1@gmail.com" class="social-btn" target="_blank" aria-label="Gmail">
+  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nexia.labs1@gmail.com" class="social-btn" target="_blank" aria-label="Gmail">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -1115,7 +1121,6 @@ footer{
   </svg>
 </a>
 
-  <!-- TikTok -->
   <a href="https://tiktok.com" class="social-btn" target="_blank" aria-label="TikTok">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1132,7 +1137,6 @@ footer{
   </svg>
 </a>
 </div>
-```
 
 
   </div>
@@ -1152,8 +1156,7 @@ footer{
       Mensaje Directo
     </h2>
 
-  <!-- FORM -->
-   <form method="POST">
+  <form method="POST">
     {% csrf_token %}
 
     <div class="form-group">
@@ -1181,8 +1184,6 @@ footer{
 
 </div>
 
-<!-- ===== LOCATION ===== -->
-
 <section class="location-section">
 
   <div class="location-header">
@@ -1207,8 +1208,6 @@ footer{
   </div>
 
   <div class="location-grid">
-
-    <!-- MAP -->
 
     <div class="map-card">
 
@@ -1254,8 +1253,6 @@ footer{
       </div>
 
     </div>
-
-    <!-- INFO -->
 
     <div class="location-info-card">
 
@@ -1351,13 +1348,9 @@ footer{
 
 </main>
 
-<!-- ===== FOOTER ===== -->
-
 <footer>
   © 2026 NEXIA Labs — Todos los derechos reservados.
 </footer>
-
-<!-- ===== SCRIPTS ===== -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -1444,38 +1437,39 @@ window.addEventListener('scroll', () => {
 
 });
 
-/* ===== MAP ===== */
+/* ===== MAPA MODIFICADO ===== */
 
 const map = L.map('map', {
-  zoomControl:true,
-  scrollWheelZoom:false
-})
-.setView([-13.2607, -64.0618], 13);
+  zoomControl: true,
+  scrollWheelZoom: false
+}).setView([-13.2607, -64.0618], 14);
 
 L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  {
-    attribution:''
-  }
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+  attribution:'',
+  maxZoom:19
+}
 ).addTo(map);
 
 const customIcon = L.divIcon({
   className:'custom-marker',
   html:`
     <div style="
-      width:22px;
-      height:22px;
+      width:26px;
+      height:26px;
       border-radius:50%;
       background:#00E5FF;
-      border:4px solid rgba(255,255,255,0.9);
+      border:4px solid #FFFFFF;
       box-shadow:
-        0 0 25px rgba(0,229,255,0.9),
-        0 0 60px rgba(0,229,255,0.5);
+        0 0 20px #00E5FF,
+        0 0 40px rgba(0,229,255,.8),
+        0 0 70px rgba(0,229,255,.4);
       animation:pulse 2s infinite;
     "></div>
   `,
-  iconSize:[22,22],
-  iconAnchor:[11,11]
+  iconSize:[26,26],
+  iconAnchor:[13,13]
 });
 
 L.marker(
@@ -1498,133 +1492,92 @@ L.marker(
   </div>
 `);
 
-/* ===== PLEXUS ===== */
+/* ===== PLEXUS NEURONAL MEJORADO ===== */
 
-const canvas =
-  document.getElementById("bg");
-
-const ctx =
-  canvas.getContext("2d");
-
-function resizeCanvas(){
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-}
-
-resizeCanvas();
-
-window.addEventListener(
-  'resize',
-  resizeCanvas
-);
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 
 let particles = [];
+const colors = ["#00E5FF", "#6C4DFF"]; // Colores Cyberpunk: Cyan y Violeta
 
-const particleCount =
-  Math.min(65, window.innerWidth / 15);
+function initParticles() {
+  particles = [];
+  // Asegurar al menos 50 partículas en móviles para que no se vea vacío
+  const particleCount = window.innerWidth < 768 ? 50 : Math.min(80, window.innerWidth / 15);
 
-for(let i=0; i<particleCount; i++){
-
-  particles.push({
-
-    x:Math.random() * canvas.width,
-
-    y:Math.random() * canvas.height,
-
-    vx:(Math.random() - 0.5) * 0.5,
-
-    vy:(Math.random() - 0.5) * 0.5,
-
-    radius:Math.random() * 2.2 + 1.5
-
-  });
-
+  for(let i=0; i<particleCount; i++){
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.7, 
+      vy: (Math.random() - 0.5) * 0.7,
+      radius: Math.random() * 3 + 2, // Bolitas más grandes
+      color: colors[Math.floor(Math.random() * colors.length)] // Color aleatorio
+    });
+  }
 }
 
-function animate(){
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initParticles();
+}
 
-  ctx.clearRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
+window.addEventListener('resize', resizeCanvas);
+
+function animate(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   particles.forEach(p => {
-
     p.x += p.vx;
     p.y += p.vy;
 
-    if(
-      p.x < 0 ||
-      p.x > canvas.width
-    ) p.vx *= -1;
+    if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+    if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
-    if(
-      p.y < 0 ||
-      p.y > canvas.height
-    ) p.vy *= -1;
-
-    ctx.fillStyle = "#00E5FF";
-
+    // Dibujar partículas con brillo
     ctx.beginPath();
-
-    ctx.arc(
-      p.x,
-      p.y,
-      p.radius,
-      0,
-      Math.PI * 2
-    );
-
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.shadowBlur = 12; // Efecto Glow
+    ctx.shadowColor = p.color;
     ctx.fill();
-
   });
 
-  for(let i=0; i<particles.length; i++){
+  // Dibujar conexiones
+  for(let i = 0; i < particles.length; i++) {
+    for(let j = i + 1; j < particles.length; j++) {
+      const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+      const maxDist = window.innerWidth < 768 ? 110 : 140; // Distancia adaptada para móviles
 
-    for(let j=i+1; j<particles.length; j++){
-
-      const dist = Math.hypot(
-        particles[i].x - particles[j].x,
-        particles[i].y - particles[j].y
-      );
-
-      if(dist < 135){
-
-        ctx.strokeStyle =
-          `rgba(0,229,255,${
-            0.22 * (1 - dist / 135)
-          })`;
-
-        ctx.lineWidth = 0.7;
-
+      if(dist < maxDist) {
+        // Opacidad aumentada
+        let opacity = 0.6 * (1 - dist / maxDist);
+        
+        ctx.shadowBlur = 0; // Apagamos el blur en las líneas por rendimiento
+        
+        // La línea toma el color de la partícula
+        if (particles[i].color === "#00E5FF") {
+          ctx.strokeStyle = `rgba(0, 229, 255, ${opacity})`;
+        } else {
+          ctx.strokeStyle = `rgba(108, 77, 255, ${opacity})`;
+        }
+        
+        // Líneas más gruesas, especialmente en móvil
+        ctx.lineWidth = window.innerWidth < 768 ? 1.5 : 1; 
+        
         ctx.beginPath();
-
-        ctx.moveTo(
-          particles[i].x,
-          particles[i].y
-        );
-
-        ctx.lineTo(
-          particles[j].x,
-          particles[j].y
-        );
-
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
         ctx.stroke();
-
       }
-
     }
-
   }
-
   requestAnimationFrame(animate);
-
 }
 
+// Iniciar animación
+resizeCanvas();
 animate();
 
 </script>
