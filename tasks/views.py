@@ -11,11 +11,11 @@ def index(request):
 
 def contacto(request):
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        nombre = request.POST.get('nombre')
-        correo = request.POST.get('correo')
-        mensaje = request.POST.get('mensaje')
+        nombre = request.POST.get("nombre")
+        correo = request.POST.get("correo")
+        mensaje = request.POST.get("mensaje")
 
         contenido = f"""
 Nuevo mensaje desde NEXIA Labs
@@ -29,33 +29,47 @@ Mensaje:
 
         try:
 
+            api_key = "re_KLzrDNZf_KtEpNW2Ev2WnYMSAm8GMXaVA"
+
+            print("API KEY:", api_key)
+
             response = requests.post(
                 "https://api.resend.com/emails",
                 headers={
-                    "Authorization": f"Bearer {os.environ.get('RESEND_API_KEY')}",
-                    "Content-Type": "application/json"
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
                 },
                 json={
                     "from": "onboarding@resend.dev",
-                    "to": "nexia.labs1@gmail.com",
-                    "subject": "Nuevo mensaje desde la web",
+                    "to": ["nexia.labs1@gmail.com"],
+                    "subject": "Nuevo mensaje desde NEXIA Labs",
                     "text": contenido,
                 },
-                timeout=5
+                timeout=10,
             )
 
-            if response.status_code == 200:
-                messages.success(request, 'Mensaje enviado correctamente')
+            print("STATUS:", response.status_code)
+            print("RESPUESTA:", response.text)
+
+            if response.status_code in [200, 201, 202]:
+                messages.success(
+                    request,
+                    "Mensaje enviado correctamente."
+                )
             else:
-                messages.error(request, f'Error: {response.text}')
+                messages.error(
+                    request,
+                    f"Error Resend: {response.text}"
+                )
 
         except Exception as e:
 
-            messages.error(request, f'Error: {e}')
+            print("ERROR:", str(e))
+            messages.error(request, f"Error: {str(e)}")
 
-        return redirect('contacto')
+        return redirect("contacto")
 
-    return render(request, 'contacto.html')
+    return render(request, "contacto.html")
 
 
 def sobre(request):
